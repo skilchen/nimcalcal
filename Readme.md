@@ -32,6 +32,10 @@ easy, but calendrica-3.0 is a big thing (more then 500 functions),
 so it needed quite some work.
 Until now i have translated only a very small subset of the Unit Tests to Nim.
 For me nimcalcal seems to work both on the c and on the js backend.
+skilchen wants to thank Enrico Spinielli for making PyCalCal and to express the
+great admiration he has for the masters of Calendars Prof.s Reingold and Dershowitz.
+This readme is evidently the one from Enrico Spinielli. So the "I" in the following
+text always refers to Mr. Spinielli.
 
 See '_STATUS_' file for further details.
 
