@@ -10,3 +10,4 @@ import egyptianAndArmenianCalendarsUnitTest
 import copticAndEthiopicCalendarsUnitTest
 import julianCalendarUnitTest
 import chineseCalendarUnitTest
+import modernHinduCalendarsUnitTest

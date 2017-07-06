@@ -45,6 +45,8 @@ Translator to Nim: Samuel Kilchenmann
 #from mpmath import *
 #mp.prec = 50
 
+{.deadCodeElim: on.}
+
 import future
 import math
 import times
@@ -5010,12 +5012,12 @@ proc vietnamese_location*(tee: float64): calLocationData =
 ######################################
 # see lines 4816-4820 in calendrica-3.0.cl
 
-type hinduLDate = object
-    year: int
-    month: int
-    leap_month: bool
-    day: int
-    leap_day: bool
+type hinduLDate* = object
+    year*: int
+    month*: int
+    leap_month*: bool
+    day*: int
+    leap_day*: bool
 
 proc hindu_lunar_date*(year, month: int, leap_month: bool, day: int, leap_day: bool): hinduLDate =
     # Return a lunar Hindu date data structure.
@@ -5528,7 +5530,7 @@ proc astro_hindu_lunar_from_fixed*(date: int): hinduLDate =
     let leap_month    = solar_month == sidereal_zodiac(next_new_moon)
     let month    = amod(solar_month + 1, 12)
     let year     = astro_hindu_calendar_year(if month <= 2: date.float64 + 180
-                                             else: date.float64 - HINDU_LUNAR_ERA)
+                                             else: date.float64) - HINDU_LUNAR_ERA
     return hindu_lunar_date(year, month, leap_month, day, leap_day)
 
 
