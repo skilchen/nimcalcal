@@ -4,3 +4,9 @@ import ecclesiasticalCalendarsUnitTest
 import astronomicalLunarCalendarsUnitTest
 import isoCalendarUnitTest
 import islamicCalendarUnitTest
+import hebrewCalendarUnitTest
+import frenchRevolutionaryCalendarUnitTest
+import egyptianAndArmenianCalendarsUnitTest
+import copticAndEthiopicCalendarsUnitTest
+import julianCalendarUnitTest
+import chineseCalendarUnitTest

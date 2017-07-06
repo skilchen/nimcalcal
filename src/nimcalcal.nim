@@ -57,22 +57,22 @@ type
         month*: int
         day*: int
 
-    calTime = object
-        hour: int
-        minute: int
-        second: float64
+    calTime* = object
+        hour*: int
+        minute*: int
+        second*: float64
 
-    calISODate = object
+    calISODate* = object
         year*: int
         week*: int
         day*: int
 
-    calRomanDate = object
-        year: int
-        month: int
-        event: int
-        count: int
-        leap: bool
+    calRomanDate* = object
+        year*: int
+        month*: int
+        event*: int
+        count*: int
+        leap*: bool
 
 
 proc `$`*(date: calDate): string = 
@@ -317,25 +317,25 @@ proc rd*[T](tee: T): T =
 
 
 # see lines 331-334 in calendrica-3.0.cl
-const SUNDAY = 0
+const SUNDAY* = 0
 
 # see lines 10-15 in calendrica-3.0.errata.cl
-const MONDAY = 1
+const MONDAY* = 1
 
 # see lines 17-20 in calendrica-3.0.errata.cl
-const TUESDAY = 2
+const TUESDAY* = 2
 
 # see lines 22-25 in calendrica-3.0.errata.cl
-const WEDNESDAY = 3
+const WEDNESDAY* = 3
 
 # see lines 27-30 in calendrica-3.0.errata.cl
-const THURSDAY = 4
+const THURSDAY* = 4
 
 # see lines 32-35 in calendrica-3.0.errata.cl
-const FRIDAY = 5
+const FRIDAY* = 5
 
 # see lines 37-40 in calendrica-3.0.errata.cl
-const SATURDAY = SUNDAY + 6
+const SATURDAY* = SUNDAY + 6
 
 # const tables do not work with the nodejs backend
 let DAYS_OF_WEEK_NAMES* = {
@@ -501,9 +501,9 @@ proc moment_from_jd*[T](jd: T): float64 =
 
 
 # see lines 452-455 in calendrica-3.0.cl
-proc jd_from_moment*[T](tee: T): T =
+proc jd_from_moment*[T](tee: T): float64 =
     ## Return the Julian day number corresponding to moment 'tee'.
-    return tee - JD_EPOCH
+    return tee.float64 - JD_EPOCH
 
 
 # see lines 457-460 in calendrica-3.0.cl
@@ -513,7 +513,7 @@ proc fixed_from_jd*[T](jd: T): int =
 
 
 # see lines 462-465 in calendrica-3.0.cl
-proc jd_from_fixed*[T](date: T): T = 
+proc jd_from_fixed*[T](date: T): float64 = 
     ## Return the Julian day number corresponding to fixed date 'rd'.
     return jd_from_moment(date)
 
@@ -1030,13 +1030,13 @@ proc julian_from_fixed*(date: int): calDate =
 
 
 # see lines 1113-1116 in calendrica-3.0.cl
-const KALENDS = 1
+const KALENDS* = 1
 
 # see lines 1118-1121 in calendrica-3.0.cl
-const NONES = 2
+const NONES* = 2
 
 # see lines 1123-1126 in calendrica-3.0.cl
-const IDES = 3
+const IDES* = 3
 
 
 # see lines 1128-1131 in calendrica-3.0.cl
@@ -1490,46 +1490,46 @@ proc hebrew_date*(year, month, day: int): calDate =
 
 
 # see lines 1516-1519 in calendrica-3.0.cl
-const NISAN = 1
+const NISAN* = 1
 
 # see lines 1521-1524 in calendrica-3.0.cl
-const IYYAR = 2
+const IYYAR* = 2
 
 # see lines 1526-1529 in calendrica-3.0.cl
-const SIVAN = 3
+const SIVAN* = 3
 
 # see lines 1531-1534 in calendrica-3.0.cl
-const TAMMUZ = 4
+const TAMMUZ* = 4
 
 # see lines 1536-1539 in calendrica-3.0.cl
-const AV = 5
+const AV* = 5
 
 # see lines 1541-1544 in calendrica-3.0.cl
-const ELUL = 6
+const ELUL* = 6
 
 # see lines 1546-1549 in calendrica-3.0.cl
 const TISHRI = 7
 
 # see lines 1551-1554 in calendrica-3.0.cl
-const MARHESHVAN = 8
+const MARHESHVAN* = 8
 
 # see lines 1556-1559 in calendrica-3.0.cl
-const KISLEV = 9
+const KISLEV* = 9
 
 # see lines 1561-1564 in calendrica-3.0.cl
-const TEVET = 10
+const TEVET* = 10
 
 # see lines 1566-1569 in calendrica-3.0.cl
-const SHEVAT = 11
+const SHEVAT* = 11
 
 # see lines 1571-1574 in calendrica-3.0.cl
-const ADAR = 12
+const ADAR* = 12
 
 # see lines 1576-1579 in calendrica-3.0.cl
-const ADARII = 13
+const ADARII* = 13
 
 # const tables do not work with the nodejs backend
-let HEBREW_MONTH_NAMES = {
+let HEBREW_MONTH_NAMES* = {
     NISAN      : "Nisan",
     IYYAR      : "Iyyar",
     SIVAN      : "Sivan",
@@ -1885,7 +1885,7 @@ proc shift_days*(lst: seq[int], cap_Delta: int): seq[int] =
     ## Shift each weekday on list l by cap_Delta days.
     result = @[]
     for x in lst:
-        result.add(day_of_week_from_fixed(x) + cap_Delta)
+        result.add(day_of_week_from_fixed(x + cap_Delta))
     return result
 
 
@@ -2788,10 +2788,10 @@ proc arccos_degrees(x: float64): float64 =
 
 
 type calLocationData = object
-    latitude: float64
-    longitude: float64
-    elevation: float64
-    zone: float64
+    latitude*: float64
+    longitude*: float64
+    elevation*: float64
+    zone*: float64
 
 # see lines 3297-3300 in calendrica-3.0.cl
 const SPRING = deg(0)
@@ -2839,7 +2839,7 @@ const MECCA = location(angle(21, 25, 24), angle(39, 49, 24), mt(298), days_from_
 # see lines 5898-5901 in calendrica-3.0.cl
 const JERUSALEM = location(31.8, 35.2, mt(800), days_from_hours(2))
 
-const BRUXELLES = location(angle(4, 21, 17), angle(50, 50, 47), mt(800), days_from_hours(1))
+const BRUXELLES = location(angle(50, 50, 47), angle(4, 21, 17), mt(28), days_from_hours(1))
 
 const URBANA = location(40.1,
                   -88.2,
@@ -4597,12 +4597,12 @@ proc arithmetic_french_from_fixed*(date: int): calDate =
 ## chinese calendar algorithms #
 ################################
 
-type chinDate = object
-    cycle: int
-    year: int
-    month: int
-    leap: bool
-    day: int
+type chinDate* = object
+    cycle*: int
+    year*: int
+    month*: int
+    leap*: bool
+    day*: int
 
 # see lines 4330-4333 in calendrica-3.0.cl
 proc chinese_date*(cycle, year, month: int, leap: bool, day: int): chinDate =
@@ -4802,7 +4802,7 @@ proc chinese_from_fixed*(date: int): chinDate =
 
 
 # see lines 4567-4596 in calendrica-3.0.cl
-proc fixed_from_chinese(c_date: chinDate): int =
+proc fixed_from_chinese*(c_date: chinDate): int =
     ## Return fixed date of Chinese date, c_date.
     let cycle = chinese_cycle(c_date)
     let year  = chinese_year(c_date)
@@ -4815,10 +4815,10 @@ proc fixed_from_chinese(c_date: chinDate): int =
     let new_year = chinese_new_year_on_or_before(mid_year)
     let p = chinese_new_moon_on_or_after(new_year + ((month - 1) * 29))
     let d = chinese_from_fixed(p)
-    let prior_new_moon = if month == chinese_month(d) and leap == chinese_leap(d): 
-                              0
+    let prior_new_moon =  if month == chinese_month(d) and leap == chinese_leap(d): 
+                            p
                           else: 
-                              chinese_new_moon_on_or_after(1 + p)
+                            chinese_new_moon_on_or_after(1 + p)
     return prior_new_moon + day - 1
 
 
@@ -4833,12 +4833,12 @@ proc chinese_name*(stem, branch: int): (int, int) =
 
 
 # see lines 4617-4619 in calendrica-3.0.cl
-proc chinese_stem(name: tuple): int =
+proc chinese_stem*(name: tuple): int =
     return name[0]
 
 
 # see lines 4621-4623 in calendrica-3.0.cl
-proc chinese_branch(name: tuple): int =
+proc chinese_branch*(name: tuple): int =
     return name[1]
 
 # see lines 4625-4629 in calendrica-3.0.cl
@@ -5052,7 +5052,7 @@ proc hindu_lunar_year*(date: hinduLDate): int =
     return date.year
 
 # see lines 4842-4850 in calendrica-3.0.cl
-proc hindu_sine_table(entry: int): float64 =
+proc hindu_sine_table*(entry: int): float64 =
     ## Return the value for entry in the Hindu sine table.
     ## Entry, entry, is an angle given as a multiplier of 225'.
     let exact = 3438 * sin_degrees(entry.float64 * angle(0, 225, 0))
@@ -5061,7 +5061,7 @@ proc hindu_sine_table(entry: int): float64 =
 
 
 # see lines 4852-4861 in calendrica-3.0.cl
-proc hindu_sine(theta: float64): float64 =
+proc hindu_sine*(theta: float64): float64 =
     ## Return the linear interpolation for angle, theta, in Hindu table.
     let entry    = theta / angle(0, 225, 0)
     let fraction = modulo(entry, 1.0)
@@ -5070,7 +5070,7 @@ proc hindu_sine(theta: float64): float64 =
 
 
 # see lines 4863-4873 in calendrica-3.0.cl
-proc hindu_arcsin(amp: float64): float64 =
+proc hindu_arcsin*(amp: float64): float64 =
     ## Return the inverse of Hindu sine function of amp.
     if (amp < 0.0):
         return -hindu_arcsin(-amp)
@@ -5082,10 +5082,10 @@ proc hindu_arcsin(amp: float64): float64 =
 
 
 # see lines 4875-4878 in calendrica-3.0.cl
-const HINDU_SIDEREAL_YEAR = 365.0 + 279457.0 / 1080000.0
+const HINDU_SIDEREAL_YEAR* = 365.0 + 279457.0 / 1080000.0
 
 # see lines 4880-4883 in calendrica-3.0.cl
-const HINDU_CREATION = HINDU_EPOCH.float64 - 1955880000.0 * HINDU_SIDEREAL_YEAR
+const HINDU_CREATION* = HINDU_EPOCH.float64 - 1955880000.0 * HINDU_SIDEREAL_YEAR
 
 # see lines 4885-4889 in calendrica-3.0.cl
 proc hindu_mean_position*(tee, period: float64): float64 =
@@ -5094,16 +5094,16 @@ proc hindu_mean_position*(tee, period: float64): float64 =
     return deg(360.0) * modulo((tee - HINDU_CREATION) / period, 1.0)
 
 # see lines 4891-4894 in calendrica-3.0.cl
-const HINDU_SIDEREAL_MONTH = 27 + mpf(4644439) / mpf(14438334)
+const HINDU_SIDEREAL_MONTH* = 27 + mpf(4644439) / mpf(14438334)
 
 # see lines 4896-4899 in calendrica-3.0.cl
-const HINDU_SYNODIC_MONTH = 29 + mpf(7087771) / mpf(13358334)
+const HINDU_SYNODIC_MONTH* = 29 + mpf(7087771) / mpf(13358334)
 
 # see lines 4901-4904 in calendrica-3.0.cl
-const HINDU_ANOMALISTIC_YEAR = mpf(1577917828000)/(mpf(4320000000) - mpf(387))
+const HINDU_ANOMALISTIC_YEAR* = mpf(1577917828000)/(mpf(4320000000) - mpf(387))
 
 # see lines 4906-4909 in calendrica-3.0.cl
-const HINDU_ANOMALISTIC_MONTH = mpf(1577917828)/(mpf(57753336) - mpf(488199))
+const HINDU_ANOMALISTIC_MONTH* = mpf(1577917828)/(mpf(57753336) - mpf(488199))
 
 # # see lines 4911-4926 in calendrica-3.0.cl
 proc hindu_true_position*(tee, period, size, anomalistic, change: float64): float64 =
@@ -5162,7 +5162,7 @@ proc hindu_lunar_day_from_moment*(tee: float64): int =
 
 
 # see lines 4960-4973 in calendrica-3.0.cl
-proc hindu_new_moon_before(tee: float64): float64 =
+proc hindu_new_moon_before*(tee: float64): float64 =
     ## Return the approximate moment of last new moon preceding moment, tee,
     ## close enough to determine zodiacal sign.
     let varepsilon = pow(2.float64, -1000.float64)
@@ -5232,7 +5232,7 @@ proc fixed_from_hindu_solar*(s_date: calDate): int =
 const HINDU_LUNAR_ERA = 3044
 
 # see lines 5046-5074 in calendrica-3.0.cl
-proc hindu_lunar_from_fixed(date: int): hinduLDate =
+proc hindu_lunar_from_fixed*(date: int): hinduLDate =
     ## Return the Hindu lunar date, new_moon scheme, 
     ## equivalent to fixed date, date.
     let critical = hindu_sunrise(date)
@@ -5721,7 +5721,7 @@ proc shiva*(g_year: int): seq[int] =
 
 
 # see lines 5628-5632 in calendrica-3.0.cl
-proc rama(g_year: int): seq[int] =
+proc rama*(g_year: int): seq[int] =
     ## Return the list of fixed date(s) of Rama's Birthday in Gregorian
     ## year, g_year.
     return hindu_lunar_event(1, 9, days_from_hours(12), g_year)
@@ -5808,7 +5808,7 @@ proc tibetan_year*(date: hinduLDate): int =
     return date.year
 
 # see lines 5703-5705 in calendrica-3.0.cl
-const TIBETAN_EPOCH = fixed_from_gregorian(gregorian_date(-127, DECEMBER, 7))
+const TIBETAN_EPOCH* = fixed_from_gregorian(gregorian_date(-127, DECEMBER, 7))
 
 # see lines 5707-5717 in calendrica-3.0.cl
 proc tibetan_sun_equation*[T](alpha: T): float64 =
@@ -5943,7 +5943,7 @@ proc timeinfo_from_moment*(moment: float64): TimeInfo =
                       second: iround(time.second))
     return result
 
-proc full_moons_in_year(year: int): seq[TimeInfo] =
+proc full_moons_in_year*(year: int): seq[TimeInfo] =
     result = @[]
     let start = fixed_from_gregorian(gregorian_date(year, 1, 1))
     let endpoint = fixed_from_gregorian(gregorian_date(year+1, 1, 1)).float64
@@ -5956,7 +5956,7 @@ proc full_moons_in_year(year: int): seq[TimeInfo] =
         moment += 1.0
     return result
 
-proc ramadan_in_year(year: int): (calDate, calDate) =
+proc ramadan_in_year*(year: int): (calDate, calDate) =
     let islamic_year = islamic_from_fixed(fixed_from_gregorian(gregorian_date(year, 1, 1))).year
     let start = gregorian_from_fixed(fixed_from_islamic(islamic_date(islamic_year, 9, 1)))
     let endd = gregorian_from_fixed(fixed_from_islamic(islamic_date(islamic_year, 10, 1))-1)
