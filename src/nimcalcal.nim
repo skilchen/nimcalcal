@@ -415,7 +415,8 @@ proc clock_from_moment*[T](tee: T): calTime =
     var hour = ifloor(time * 24)
     var minute = ifloor(modulo(time * 24 * 60, 60).float64)
     let second = modulo(time * 24 * 60 * 60, 60.0).float64
-    var isecond = iround(second)
+    #var isecond = iround(second)
+    var  isecond = second
     if isecond == 60:
         minute += 1
         isecond = 0
@@ -1257,11 +1258,9 @@ proc fixed_from_iso*(i_date: calISODate): int =
 proc iso_from_fixed*(date: int): calISODate = 
     ## Return the ISO date corresponding to the fixed date 'date'.
     var approx = gregorian_year_from_fixed(date - 3)
-    let year = approx 
+    var year = approx 
     if date >= fixed_from_iso(iso_date(approx + 1, 1, 1)):
-        approx += 1
-    else:
-        approx += approx
+        year += 1
     let week   = 1 + quotient(date - fixed_from_iso(iso_date(year, 1, 1)), 7)
     let day    = amod(date - rd(0), 7)
     return iso_date(year, week, day)
@@ -5980,16 +5979,30 @@ when isMainModule:
     #     echo "hebrew     ", hebrew_from_fixed(x), ", ", fixed_from_hebrew(hebrew_from_fixed(x)) 
     #     echo gregorian_year_from_fixed(x)
 
-    #     echo "-".repeat(80)
-    echo "yom_kippur(2017): ", yom_kippur(2017), ", ", gregorian_from_fixed(yom_kippur(2017))
-    echo "sunset:    ", sunset((yom_kippur(2017)-1).float64, JERUSALEM)
-    echo "nightfall: ", sunset(yom_kippur(2017).float64, JERUSALEM)
-    echo "yom_kippur(2016): ", yom_kippur(2016), ", ", gregorian_from_fixed(yom_kippur(2016))
-    echo "sunset:    ", $timeInfoFromMoment(sunset((yom_kippur(2016)-1).float64, JERUSALEM))
-    echo "nightfall: ", $timeInfoFromMoment(sunset((yom_kippur(2016)).float64, JERUSALEM))
- 
-    echo "Full Moons:"
+    # echo "-".repeat(80)
+    # echo "yom_kippur(2017): ", yom_kippur(2017), ", ", gregorian_from_fixed(yom_kippur(2017))
+    # echo "sunset:    ", sunset((yom_kippur(2017)-1).float64, JERUSALEM)
+    # echo "nightfall: ", sunset(yom_kippur(2017).float64, JERUSALEM)
+    # echo "yom_kippur(2016): ", yom_kippur(2016), ", ", gregorian_from_fixed(yom_kippur(2016))
+    # echo "sunset:    ", $timeInfoFromMoment(sunset((yom_kippur(2016)-1).float64, JERUSALEM))
+    # echo "nightfall: ", $timeInfoFromMoment(sunset((yom_kippur(2016)).float64, JERUSALEM))
+
     let curr_year = getLocalTime(getTime()).year
+    let now = fixed_from_now()
+    echo "now: ", gregorian_from_fixed(now)
+    let hebrew_current = hebrew_from_fixed(now)
+    echo "hebrew now: ", hebrew_current
+
+    echo "-".repeat(80)
+    echo "next 20 Hebrew New Years"
+    var hyr = hebrew_current.year
+    for yr in hyr+1..hyr+21:
+      let new_yr = hebrew_new_year(yr)
+      echo gregorian_from_fixed(new_yr), " ", hebrew_from_fixed(new_yr)
+
+    echo "-".repeat(80) 
+    echo "Full Moons:"
+
 
     for fullmoon in full_moons_in_year(curr_year):
         echo $getLocalTime(fullmoon.toTime())
@@ -6007,24 +6020,50 @@ when isMainModule:
         let oe = orthodox_easter(yr)
         echo gregorian_from_fixed(e), " ", gregorian_from_fixed(oe) 
 
-    echo "Hindu Tithis for the next 30 days:"
-    let now = fixed_from_now()
+    echo "-".repeat(80)
+    echo "Hindu Tithis until end of Year:"
     let year_end = gregorian_year_end(curr_year)
     var current: int = now + 1
     for i in 1..year_end-now:
         echo gregorian_from_fixed(current), ": ", astro_lunar_day_from_moment(current.float64)
         inc(current)
+
+    echo "-".repeat(80)
     echo "next full moon:"
     echo gregorian_from_fixed(lunar_phase_at_or_after(FULL, float(now)).int)
     echo "next new moon:"
     echo gregorian_from_fixed(lunar_phase_at_or_after(NEW, float(now)).int)
 
-    echo getGMTime(fromSeconds(epochTime()))
-    echo epoch_seconds_from_moment(moment_from_now())
-    echo getGMTime(fromSeconds(epoch_seconds_from_moment(moment_from_now())))
 
     echo "-".repeat(80)
-    let x = iso_from_fixed(fixed_from_gregorian(gregorian_date(2019, 4, 24)))
-    echo "Dates in ISO Week: ", iso_year(x), " ", iso_week(x)
-    for i in dates_in_iso_week(iso_year(x), iso_week(x)):
-        echo gregorian_from_fixed(i), " ", DAYS_OF_WEEK_NAMES[day_of_week_from_fixed(i)]
+    echo "MESZ start and end in the next 10 Years"
+    for yr in curr_year..curr_year + 11:
+      let start = last_kday(SUNDAY, gregorian_date(yr, 3, 31))
+      let stop = last_kday(SUNDAY, gregorian_date(yr, 10, 31))
+      echo gregorian_from_fixed(start), " - ", gregorian_from_fixed(stop)
+
+    echo "-".repeat(80)
+    echo "Sundays in Advent in the next 10 Years"
+    for yr in curr_year..curr_year+11:
+      let frst = nth_kday(-4, SUNDAY, gregorian_date(yr, 12, 24))
+      echo gregorian_from_fixed(frst), " ", gregorian_from_fixed(frst+7), " ",
+           gregorian_from_fixed(frst + 7 * 2), " ", gregorian_from_fixed(frst + 7 * 3)
+    
+    echo "-".repeat(80)
+    echo "ISO Week until end of next Year"
+    current = now
+    var current_iso = iso_from_fixed(current)
+    var idx = fixed_from_iso(iso_date(current_iso.year, current_iso.week, 1))
+    let stop = gregorian_year_end(current_iso.year + 1)
+    while true:
+      if idx >= stop:
+        break
+      let curr_iso = iso_from_fixed(idx)
+      var week_nr = ""
+      if curr_iso.week < 10:
+        week_nr.add(" ")
+      week_nr.add($curr_iso.week)
+
+      echo week_nr, ": ", gregorian_from_fixed(idx), " - ", gregorian_from_fixed(idx + 7)
+      idx += 8
+

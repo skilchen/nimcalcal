@@ -35,7 +35,7 @@ suite "BasicCodeTestCase":
         # new function y = f(x), f(x) = x**2 - 4*x + 4, y0 = 0.0; solution x0=2.0
         y = 0.0
         x0 = 2.0
-        fx = proc(x:float64):float64 = x ^ 2 - 4 * x + 4.0
+        fx = proc(x:float64):float64 = pow(x, 2.0) - 4.0 * x + 4.0
         check binary_search(1.5, 2.5, p, e) - x0 <= pow(10.0, -5.0)
 
 
@@ -80,7 +80,7 @@ suite "BasicCodeTestCase":
         c = clock_from_moment(3.8)
         check hour(c) == 19
         check minute(c) == 11
-        check seconds(c) == 59
+        check abs(seconds(c) - 59.9999) < pow(10.0, -2.0)
 
 
     test "testTimeFromClock":

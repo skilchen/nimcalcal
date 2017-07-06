@@ -12,7 +12,7 @@ backend       = "c"
 
 # Dependencies
 
-requires "nim >= 0.16.0"
+requires "nim >= 0.17.0"
 
 task tests, "Run the nimcalcal tester":
   exec "nim c -r tests/all"
