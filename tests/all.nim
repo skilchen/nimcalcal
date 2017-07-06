@@ -1,3 +1,6 @@
 import basicCodeUnitTest
 import gregorianCalendarUnitTest
 import ecclesiasticalCalendarsUnitTest
+import astronomicalLunarCalendarsUnitTest
+import isoCalendarUnitTest
+import islamicCalendarUnitTest

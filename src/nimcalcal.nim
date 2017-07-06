@@ -60,12 +60,12 @@ type
     calTime = object
         hour: int
         minute: int
-        second: int
+        second: float64
 
     calISODate = object
-        year: int
-        week: int
-        day: int
+        year*: int
+        week*: int
+        day*: int
 
     calRomanDate = object
         year: int
@@ -373,7 +373,7 @@ proc standard_year*(date: calDate): int =
 
 
 # see lines 386-388 in calendrica-3.0.cl
-proc time_of_day*(hour, minute, second: int): calTime = 
+proc time_of_day*(hour, minute: int, second: float64): calTime = 
     ## Return the time of day data structure
     return calTime(hour: hour, minute: minute, second: second)
 
@@ -391,7 +391,7 @@ proc minute*(clock: calTime): int =
 
 
 # see lines 398-400 in calendrica-3.0.cl
-proc seconds*(clock: calTime): int =
+proc seconds*(clock: calTime): float64 =
     ## Return the seconds of clock time 'clock'.
     return clock.second
 
@@ -422,7 +422,7 @@ proc clock_from_moment*[T](tee: T): calTime =
         if minute == 60:
             hour += 1
             minute = 0
-    return time_of_day(hour, minute, isecond)
+    return time_of_day(hour, minute, isecond.float64)
 
 
 # see lines 421-427 in calendrica-3.0.cl
@@ -678,7 +678,7 @@ proc moment_from_now*(): float64 =
     let ti = getGMTime(fromSeconds(epochTime()))
     let fixed = fixed_from_gregorian(
                   gregorian_date(ti.year, ord(ti.month) + 1, ti.monthday))
-    let td = time_of_day(ti.hour, ti.minute, ti.second)
+    let td = time_of_day(ti.hour, ti.minute, ti.second.float64)
     return fixed.float64 + time_from_clock(td)
 
 proc epoch_seconds_from_moment(moment: float64): float64 =
@@ -2768,7 +2768,7 @@ proc arctan_degrees(y, x: float64): float64 =
    if (x == 0) and (y != 0):
        return modulo(signum(y) * deg(90.float64), 360.float64)
    else:
-       let alpha = normalized_degrees_from_radians(arctan2(y, x))
+       let alpha = normalized_degrees_from_radians(arctan(y / x))
        if x >= 0:
            return alpha
        else:
@@ -3063,11 +3063,13 @@ proc declination*(tee, beta, lam: float64): float64 =
 proc right_ascension*(tee, beta, lam: float64): float64 =
     ## Return right ascension at moment UT 'tee' of object at
     ## latitude 'lam' and longitude 'beta'.
+
     let varepsilon = obliquity(tee)
     return arctan_degrees(
         (sin_degrees(lam) * cosine_degrees(varepsilon)) -
         (tangent_degrees(beta) * sin_degrees(varepsilon)),
         cosine_degrees(lam)) 
+
 
 proc solar_longitude*(tee: float64): float64 {.gcsafe.}
 
@@ -4075,7 +4077,9 @@ proc phasis_on_or_before*(date: int, location: calLocationData): int =
         tau = mean - 30
     else:
         tau = mean - 2
-    return  next(tau, proc(d:int):bool = visible_crescent(d.float64, location))
+
+    result = next(tau, proc(d:int):bool = visible_crescent(d.float64, location))
+
 
 # see lines 5862-5866 in calendrica-3.0.cl
 # see lines 220-221 in calendrica-3.0.errata.cl
@@ -4097,7 +4101,7 @@ proc fixed_from_observational_islamic*(i_date: calDate): int =
 
 
 # see lines 5884-5896 in calendrica-3.0.cl
-proc observational_islamic_from_fixed(date: int): calDate =
+proc observational_islamic_from_fixed*(date: int): calDate =
     ## Return Observational Islamic date (year month day)
     ## corresponding to fixed date, date.
     let crescent = phasis_on_or_before(date, ISLAMIC_LOCATION)
@@ -5937,7 +5941,7 @@ proc timeinfo_from_moment*(moment: float64): TimeInfo =
                       monthday: date.day,
                       hour: time.hour,
                       minute: time.minute,
-                      second: time.second)
+                      second: iround(time.second))
     return result
 
 proc full_moons_in_year(year: int): seq[TimeInfo] =
