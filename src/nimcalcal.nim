@@ -414,7 +414,7 @@ proc clock_from_moment*[T](tee: T): calTime =
     let time = time_from_moment(tee)
     var hour = ifloor(time * 24)
     var minute = ifloor(modulo(time * 24 * 60, 60).float64)
-    let second = modulo(time * 24 * 60 * 60, 60).float64
+    let second = modulo(time * 24 * 60 * 60, 60.0).float64
     var isecond = iround(second)
     if isecond == 60:
         minute += 1
