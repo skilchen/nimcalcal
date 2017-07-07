@@ -19,7 +19,7 @@ before_script:
 
 script:
   - nim c -r tests/all
-  - nimble install -y
+  - nim c -r nimcalcal
 
 notifications:
   email: "skilchen@bluewin.ch"
