@@ -6022,7 +6022,7 @@ when isMainModule:
 #    echo "hindu_fullmoon_from_fixed         ", $hindu_fullmoon_from_fixed(now)
     echo "astro_hindu_solar_from_fixed      ", $astro_hindu_solar_from_fixed(now)
     echo "astro_hindu_lunar_from_fixed      ", $astro_hindu_lunar_from_fixed(now)
-    echo "tibetan_from_fixed                ", $tibetan_from_fixed(now)
+#    echo "tibetan_from_fixed                ", $tibetan_from_fixed(now)
 
 
     echo "-".repeat(80)
