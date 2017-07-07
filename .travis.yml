@@ -19,7 +19,8 @@ before_script:
 
 script:
   - nim c -r tests/all
-  - nim c -r nimcalcal
+  - nim c -r src/nimcalcal
+  - nim js -d:nodejs --threads:off -r src/nimcalcal.nim
 
 notifications:
   email: "skilchen@bluewin.ch"
