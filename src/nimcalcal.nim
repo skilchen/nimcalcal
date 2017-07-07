@@ -112,7 +112,7 @@ proc `$`*(time: calTime): string =
     result.add($time.second)
 
 
-proc mpf[T](x: T): float64 =
+proc mpf*[T](x: T): float64 =
     return x.float64
 
 #################################
@@ -128,7 +128,7 @@ const BOGUS = "bogus"
 proc ifloor*[T](n: T): int = 
     ## Return the whole part of m/n.
     # from math import floor
-    return int(floor(n.float64))
+    return floor(n.float64).int
 
 
 # see lines 249-252 in calendrica-3.0.cl
@@ -172,20 +172,31 @@ proc amod*[T](x, y: T): int =
 
 
 # see lines 259-264 in calendrica-3.0.cl
-proc next*[T](i: T, p: proc(x: T): bool): T =
+proc next*(i: int, p: proc(x: int): bool): int =
     ## Return first integer greater or equal to initial index, i,
     ## such that condition, p, holds.
-    if p(i):
-        return i 
-    else:
-        return(next(i + 1, p))
+    var n = i
+
+    while true:
+        if (n - i) > 1000:
+            raise newException(ValueError, "not working")
+        if p(n):
+            return n
+        else:
+            inc(n)
 
 
 # see lines 266-271 in calendrica-3.0.cl
-proc final*[T](i: T, p: proc(x: T): bool): T =
+proc final*(i: int, p: proc(x: int): bool): int =
     ## Return last integer greater or equal to initial index, i,
     ## such that condition, p, holds.
-    return if not p(i): i - 1  else: final(i + 1, p)
+    var n = i
+    while true:
+        if not p(n):
+            return n - 1
+        else:
+            inc(n)
+
 
 
 # see lines 273-281 in calendrica-3.0.cl
@@ -241,7 +252,7 @@ proc invert_angular*(f: proc(x: float64): float64,
                          (proc(x: float64): bool = modulo((f(x) - y), 360.0) < 180.0))
 
 
-proc myzip[T](seqs: varargs[seq[T]]): seq[seq[T]] =
+proc myzip*[T](seqs: varargs[seq[T]]): seq[seq[T]] =
     var minLen = high(int)
     for i in items(seqs):
         if i.len < minLen:
@@ -467,7 +478,7 @@ proc endr(range: tuple): int =
 
 
 # see lines 497-500 in calendrica-3.0.cl
-proc is_in_range[T](tee: T, range: tuple): bool =
+proc is_in_range*[T](tee: T, range: tuple): bool =
     ## Return True if moment 'tee' falls within range 'range',
     ## False otherwise.
     if start(range) <= tee and tee <= endr(range):
@@ -477,7 +488,7 @@ proc is_in_range[T](tee: T, range: tuple): bool =
 
 
 # see lines 502-510 in calendrica-3.0.cl
-proc list_range[T](ell: openArray[T], range: tuple): seq[T] =
+proc list_range*[T](ell: openArray[T], range: tuple): seq[T] =
     ## Return those moments in list ell that occur in range 'range'.
     result = @[]
     for i in ell:
@@ -487,13 +498,13 @@ proc list_range[T](ell: openArray[T], range: tuple): seq[T] =
 
 
 # see lines 482-485 in calendrica-3.0.cl
-proc interval[T](t0, t1: T): (T, T) = 
+proc interval*[T](t0, t1: T): (T, T) = 
     ## Return the range data structure.
     return (t0, t1)
 
 
 # see lines 442-445 in calendrica-3.0.cl
-const JD_EPOCH = rd(-1721424.5.float64)
+const JD_EPOCH* = rd(-1721424.5.float64)
 
 
 # see lines 447-450 in calendrica-3.0.cl
@@ -521,7 +532,7 @@ proc jd_from_fixed*[T](date: T): float64 =
 
 
 # see lines 467-470 in calendrica-3.0.cl
-const MJD_EPOCH = rd(678576)
+const MJD_EPOCH* = rd(678576)
 
 
 # see lines 472-475 in calendrica-3.0.cl
@@ -575,7 +586,7 @@ proc armenian_date*(year, month, day: int): calDate =
 
 
 # see lines 560-564 in calendrica-3.0.cl
-const ARMENIAN_EPOCH = rd(201443)
+const ARMENIAN_EPOCH* = rd(201443)
 
 
 # see lines 566-575 in calendrica-3.0.cl
@@ -605,7 +616,7 @@ proc gregorian_date*(year, month, day: int): calDate =
 
 
 # see lines 591-595 in calendrica-3.0.cl 
-const GREGORIAN_EPOCH = rd(1)
+const GREGORIAN_EPOCH* = rd(1)
 
 # see lines 597-600 in calendrica-3.0.cl
 const JANUARY* = 1
@@ -671,7 +682,7 @@ proc fixed_from_gregorian*(g_date: calDate): int =
             result -= 2
     result += day
 
-const UNIX_EPOCH = fixed_from_gregorian(gregorian_date(1970, 1, 1))
+const UNIX_EPOCH* = fixed_from_gregorian(gregorian_date(1970, 1, 1))
 
 proc fixed_from_now*(): int =
     let ti = getGMTime(fromSeconds(epochTime()))
@@ -684,7 +695,7 @@ proc moment_from_now*(): float64 =
     let td = time_of_day(ti.hour, ti.minute, ti.second.float64)
     return fixed.float64 + time_from_clock(td)
 
-proc epoch_seconds_from_moment(moment: float64): float64 =
+proc epoch_seconds_from_moment*(moment: float64): float64 =
     return (moment - UNIX_EPOCH.float64) * 24 * 60 * 60 
 
 proc lunar_phase*(tee: float64): float64 {.gcsafe.}
@@ -695,23 +706,14 @@ proc gregorian_from_fixed*(date: int): calDate {.gcsafe.}
 proc gregorian_year_from_fixed*(date: int): int =
     ## Return the Gregorian year corresponding to the fixed date 'date'.
     let d0   = date - GREGORIAN_EPOCH
-    #echo "d0: ", d0
     let n400 = quotient(d0, 146097)
-    #echo "n400: ", n400
     let d1   = modulo(d0, 146097)
-    #echo "d1: ", d1
     let n100 = quotient(d1, 36524)
-    #echo "n100: ", n100
     let d2   = modulo(d1, 36524)
-    #echo "d2: ", d2
     let n4   = quotient(d2, 1461)
-    #echo "n4: ", n4
     let d3   = modulo(d2, 1461)
-    #echo "d3: ", d3
     let n1   = quotient(d3, 365)
-    #echo "n1: ", n1
     let year = (400 * n400) + (100 * n100) + (4 * n4) + n1
-    #echo "year: ", year
     if n100 == 4 or n1 == 4:
         return year
     else:
@@ -981,7 +983,7 @@ proc julian_date*(year, month, day: int): calDate =
 
 
 # see lines 1042-1045 in calendrica-3.0.cl
-const JULIAN_EPOCH = fixed_from_gregorian(gregorian_date(0, DECEMBER, 30))
+const JULIAN_EPOCH* = fixed_from_gregorian(gregorian_date(0, DECEMBER, 30))
 
 
 # see lines 1047-1050 in calendrica-3.0.cl
@@ -1176,7 +1178,7 @@ proc roman_from_fixed*(date: int): calRomanDate =
 
 
 # see lines 1231-1234 in calendrica-3.0.cl
-const YEAR_ROME_FOUNDED = bce(753)
+const YEAR_ROME_FOUNDED* = bce(753)
 
 
 # see lines 1236-1241 in calendrica-3.0.cl
@@ -1275,7 +1277,7 @@ proc is_iso_long_year*(i_year: int): bool =
     let dec31 = day_of_week_from_fixed(gregorian_year_end(i_year))
     return (jan1 == THURSDAY) or (dec31 == THURSDAY)
 
-proc dates_in_iso_week(year, iso_week_nr: int): seq[int] =
+proc dates_in_iso_week*(year, iso_week_nr: int): seq[int] =
     result = @[]
     var first = fixed_from_iso(iso_date(year, iso_week_nr, 1))
     result.add(first)
@@ -1292,7 +1294,7 @@ proc coptic_date*(year, month, day: int): calDate =
 
 
 # see lines 1281-1284 in calendrica-3.0.cl
-const COPTIC_EPOCH = fixed_from_julian(julian_date(ce(284), AUGUST, 29))
+const COPTIC_EPOCH* = fixed_from_julian(julian_date(ce(284), AUGUST, 29))
 
 
 # see lines 1286-1289 in calendrica-3.0.cl
@@ -1331,7 +1333,7 @@ proc ethiopic_date*(year, month, day: int): calDate =
 
 
 # see lines 1325-1328 in calendrica-3.0.cl
-const ETHIOPIC_EPOCH = fixed_from_julian(julian_date(ce(8), AUGUST, 29))
+const ETHIOPIC_EPOCH* = fixed_from_julian(julian_date(ce(8), AUGUST, 29))
 
 # see lines 1330-1339 in calendrica-3.0.cl
 proc fixed_from_ethiopic*(e_date: calDate): int =
@@ -1430,7 +1432,7 @@ proc islamic_date*(year, month, day: int): calDate =
 
 
 # see lines 1441-1444 in calendrica-3.0.cl
-const ISLAMIC_EPOCH = fixed_from_julian(julian_date(ce(622), JULY, 16))
+const ISLAMIC_EPOCH* = fixed_from_julian(julian_date(ce(622), JULY, 16))
 
 
 # see lines 1446-1449 in calendrica-3.0.cl
@@ -1922,12 +1924,12 @@ proc possible_hebrew_days*(h_month: int, h_day: int): seq[int] =
 ## mayan calendars algorithms #
 ###############################
 # see lines 1989-1992 in calendrica-3.0.cl
-type calMayanLongCountDate = object
-    baktun: int
-    katun: int
-    tun: int
-    uinal: int
-    kin: int
+type calMayanLongCountDate* = object
+    baktun*: int
+    katun*: int
+    tun*: int
+    uinal*: int
+    kin*: int
 
 proc mayan_long_count_date*(baktun, katun, tun, uinal, kin: int): calMayanLongCountDate =
     ## Return a long count Mayan date data structure. 
@@ -1937,9 +1939,9 @@ proc mayan_long_count_date*(baktun, katun, tun, uinal, kin: int): calMayanLongCo
                               uinal: uinal,
                               kin: kin)
 
-type calMayanHaabDate = object
-    month: int
-    day: int
+type calMayanHaabDate* = object
+    month*: int
+    day*: int
 
 # see lines 1994-1996 in calendrica-3.0.cl
 proc mayan_haab_date*(month, day: int): calMayanHaabDate =
@@ -1947,9 +1949,9 @@ proc mayan_haab_date*(month, day: int): calMayanHaabDate =
     return calMayanHaabDate(month: month, day: day)
 
 
-type calMayanTzolkinDate = object
-    number: int
-    name: int
+type calMayanTzolkinDate* = object
+    number*: int
+    name*: int
 
 # see lines 1998-2001 in calendrica-3.0.cl
 proc mayan_tzolkin_date*(number, name: int): calMayanTzolkinDate =
@@ -1979,7 +1981,7 @@ proc mayan_tun*(date: calMayanLongCountDate): int =
 
 
 # see lines 2015-2017 in calendrica-3.0.cl
-proc mayan_uinal(date: calMayanLongCountDate): int =
+proc mayan_uinal*(date: calMayanLongCountDate): int =
     ## Return the uinal field of a long count Mayan
     ## date = [baktun, katun, tun, uinal, kin].
     return date.uinal
@@ -2017,7 +2019,7 @@ proc mayan_tzolkin_name*(date: calMayanTzolkinDate): int =
 
 
 # see lines 2039-2044 in calendrica-3.0.cl
-const MAYAN_EPOCH = fixed_from_jd(584283)
+const MAYAN_EPOCH* = fixed_from_jd(584283)
 
 
 # see lines 2046-2060 in calendrica-3.0.cl
@@ -2137,9 +2139,9 @@ proc mayan_calendar_round_on_or_before*(haab: calMayanHaabDate,
         raise newException(ValueError, BOGUS)
 
 
-type calAztecXihuitlDate = object
-    month: int
-    day: int
+type calAztecXihuitlDate* = object
+    month*: int
+    day*: int
 
 # see lines 2170-2173 in calendrica-3.0.cl
 proc aztec_xihuitl_date*(month, day: int): calAztecXihuitlDate =
@@ -2159,9 +2161,9 @@ proc aztec_xihuitl_day*(date: calAztecXihuitlDate): int =
     return date.day
 
 
-type calAztecTonalpoHualliDate = object
-    number: int
-    name: int
+type calAztecTonalpoHualliDate* = object
+    number*: int
+    name*: int
 
 # see lines 2183-2186 in calendrica-3.0.cl
 proc aztec_tonalpohualli_date*(number, name: int): calAztecTonalpoHualliDate =
@@ -2181,9 +2183,9 @@ proc aztec_tonalpohualli_name*(date: calAztecTonalpoHualliDate): int =
     return date.name
 
 
-type calAztecXiuhmolpilliDesignation = object
-    number: int
-    name: int
+type calAztecXiuhmolpilliDesignation* = object
+    number*: int
+    name*: int
 
 # see lines 2197-2200 in calendrica-3.0.cl
 proc aztec_xiuhmolpilli_designation*(number, name: int): calAztecXiuhmolpilliDesignation =
@@ -2206,7 +2208,7 @@ proc aztec_xiuhmolpilli_name*(date: calAztecXiuhmolpilliDesignation): int =
 
 
 # see lines 2212-2215 in calendrica-3.0.cl
-const AZTEC_CORRELATION = fixed_from_julian(julian_date(1521, AUGUST, 13))
+const AZTEC_CORRELATION* = fixed_from_julian(julian_date(1521, AUGUST, 13))
 
 # see lines 2217-2223 in calendrica-3.0.cl
 proc aztec_xihuitl_ordinal*(x_date: calAztecXihuitlDate): int =
@@ -2217,7 +2219,7 @@ proc aztec_xihuitl_ordinal*(x_date: calAztecXihuitlDate): int =
     return  ((month - 1) * 20) + day - 1
 
 # see lines 2225-2229 in calendrica-3.0.cl
-const AZTEC_XIHUITL_CORRELATION = (AZTEC_CORRELATION -
+const AZTEC_XIHUITL_CORRELATION* = (AZTEC_CORRELATION -
                                    aztec_xihuitl_ordinal(aztec_xihuitl_date(11, 2)))
 
 
@@ -2249,7 +2251,7 @@ proc aztec_tonalpohualli_ordinal*(t_date: calAztecTonalpoHualliDate): int =
 
 
 # see lines 2257-2262 in calendrica-3.0.cl
-const AZTEC_TONALPOHUALLI_CORRELATION = (AZTEC_CORRELATION -
+const AZTEC_TONALPOHUALLI_CORRELATION* = (AZTEC_CORRELATION -
                                          aztec_tonalpohualli_ordinal(
                                          aztec_tonalpohualli_date(1, 5)))
 
@@ -2306,11 +2308,11 @@ proc aztec_xiuhmolpilli_from_fixed*(date: int): calAztecTonalpoHualliDate =
 ## old hindu calendars algorithms #
 ###################################
 
-type oHinduDate = object
-    year: int
-    month: int
-    leap: bool
-    day: int
+type oHinduDate* = object
+    year*: int
+    month*: int
+    leap*: bool
+    day*: int
 
 
 # see lines 2321-2325 in calendrica-3.0.cl
@@ -2354,13 +2356,13 @@ proc hindu_solar_date*(year, month, day: int): calDate =
 
 
 # see lines 2348-2351 in calendrica-3.0.cl
-const HINDU_EPOCH = fixed_from_julian(julian_date(bce(3102), FEBRUARY, 18))
+const HINDU_EPOCH* = fixed_from_julian(julian_date(bce(3102), FEBRUARY, 18))
 
 # see lines 2358-2361 in calendrica-3.0.cl
-const ARYA_SOLAR_YEAR = 1577917500/4320000
+const ARYA_SOLAR_YEAR* = 1577917500/4320000
 
 # see lines 2363-2366 in calendrica-3.0.cl
-const ARYA_SOLAR_MONTH = ARYA_SOLAR_YEAR / 12
+const ARYA_SOLAR_MONTH* = ARYA_SOLAR_YEAR / 12
 
 
 # see lines 2353-2356 in calendrica-3.0.cl
@@ -2401,10 +2403,10 @@ proc fixed_from_old_hindu_solar*(s_date: calDate): int =
                 day + days_from_hours(-30))
 
 # see lines 2392-2395 in calendrica-3.0.cl
-const ARYA_LUNAR_MONTH = 1577917500.float64 / 53433336.float64
+const ARYA_LUNAR_MONTH* = 1577917500.float64 / 53433336.float64
 
 # see lines 2397-2400 in calendrica-3.0.cl
-const ARYA_LUNAR_DAY =  ARYA_LUNAR_MONTH / 30.float64
+const ARYA_LUNAR_DAY* =  ARYA_LUNAR_MONTH / 30.float64
 
 
 # see lines 2402-2409 in calendrica-3.0.cl
@@ -2452,7 +2454,7 @@ proc fixed_from_old_hindu_lunar*(l_date: oHinduDate): int =
     return ceiling(temp)
 
 # see lines 2462-2466 in calendrica-3.0.cl
-const ARYA_JOVIAN_PERIOD =  1577917500.float64 / 364224.float64
+const ARYA_JOVIAN_PERIOD* =  1577917500.float64 / 364224.float64
 
 # see lines 2468-2473 in calendrica-3.0.cl
 proc jovian_year*(date: int): int =
@@ -2464,17 +2466,17 @@ proc jovian_year*(date: int): int =
 # balinese calendar algorithms #
 ################################
 # see lines 2478-2481 in calendrica-3.0.cl
-type calBalDate = object
-    luang: bool
-    dwiwara: int
-    triwara: int
-    caturwara: int
-    pancawara: int
-    sadwara: int
-    saptawara: int
-    asatawara: int
-    sangawara: int
-    dasawara: int
+type calBalDate* = object
+    luang*: bool
+    dwiwara*: int
+    triwara*: int
+    caturwara*: int
+    pancawara*: int
+    sadwara*: int
+    saptawara*: int
+    asatawara*: int
+    sangawara*: int
+    dasawara*: int
 
 
 proc balinese_date*(b1: bool, b2, b3, b4, b5, b6, b7, b8, b9, b0: int): calBalDate =
@@ -2532,7 +2534,7 @@ proc bali_dasawara*(b_date: calBalDate): int =
     return b_date.dasawara
 
 # see lines 2523-2526 in calendrica-3.0.cl
-const BALI_EPOCH = fixed_from_jd(146)
+const BALI_EPOCH* = fixed_from_jd(146)
 
 # see lines 2528-2531 in calendrica-3.0.cl
 proc bali_day_from_fixed*(date: int): int =
@@ -2789,23 +2791,23 @@ proc arccos_degrees(x: float64): float64 =
     return normalized_degrees_from_radians(arccos(x))
 
 
-type calLocationData = object
+type calLocationData* = object
     latitude*: float64
     longitude*: float64
     elevation*: float64
     zone*: float64
 
 # see lines 3297-3300 in calendrica-3.0.cl
-const SPRING = deg(0)
+const SPRING* = deg(0)
 
 # see lines 3302-3305 in calendrica-3.0.cl
-const SUMMER = deg(90)
+const SUMMER* = deg(90)
 
 # see lines 3307-3310 in calendrica-3.0.cl
-const AUTUMN = deg(180)
+const AUTUMN* = deg(180)
 
 # see lines 3312-3315 in calendrica-3.0.cl
-const WINTER = deg(270)
+const WINTER* = deg(270)
 
 # see lines 2751-2753 in calendrica-3.0.cl
 proc location*(latitude, longitude, elevation, zone: float64): calLocationData =
@@ -2836,19 +2838,19 @@ proc zone*(location: calLocationData): float64 =
     return location.zone
 
 # see lines 2771-2775 in calendrica-3.0.cl
-const MECCA = location(angle(21, 25, 24), angle(39, 49, 24), mt(298), days_from_hours(3))
+const MECCA* = location(angle(21, 25, 24), angle(39, 49, 24), mt(298), days_from_hours(3))
 
 # see lines 5898-5901 in calendrica-3.0.cl
-const JERUSALEM = location(31.8, 35.2, mt(800), days_from_hours(2))
+const JERUSALEM* = location(31.8, 35.2, mt(800), days_from_hours(2))
 
-const BRUXELLES = location(angle(50, 50, 47), angle(4, 21, 17), mt(28), days_from_hours(1))
+const BRUXELLES* = location(angle(50, 50, 47), angle(4, 21, 17), mt(28), days_from_hours(1))
 
-const URBANA = location(40.1,
+const URBANA* = location(40.1,
                   -88.2,
                   mt(225),
                   days_from_hours(-6))
 
-const GREENWHICH = location(51.4777815,
+const GREENWHICH* = location(51.4777815,
                       0,
                       mt(46.9),
                       days_from_hours(0))
@@ -3137,10 +3139,10 @@ proc moment_of_depression*(approx: float64, location: calLocationData,
 
 
 # see lines 2965-2968 in calendrica-3.0.cl
-const MORNING = true
+const MORNING* = true
 
 # see lines 2970-2973 in calendrica-3.0.cl
-const EVENING = false
+const EVENING* = false
 
 
 # see lines 2975-2984 in calendrica-3.0.cl
@@ -3356,13 +3358,13 @@ proc sidereal_from_moment*(tee: float64): float64 =
                   360.0)
 
 # see lines 3128-3130 in calendrica-3.0.cl
-const MEAN_TROPICAL_YEAR = mpf(365.242189)
+const MEAN_TROPICAL_YEAR* = mpf(365.242189)
 
 # see lines 3132-3134 in calendrica-3.0.cl
-const MEAN_SIDEREAL_YEAR = mpf(365.25636)
+const MEAN_SIDEREAL_YEAR* = mpf(365.25636)
 
 # see lines 93-97 in calendrica-3.0.errata.cl
-const MEAN_SYNODIC_MONTH = mpf(29.530588861)
+const MEAN_SYNODIC_MONTH* = mpf(29.530588861)
 
 # see lines 3140-3176 in calendrica-3.0.cl
 proc ephemeris_correction*(tee: float64): float64 =
@@ -3532,18 +3534,18 @@ proc precession*(tee: float64): float64 =
 
 
 # see lines 5207-5211 in calendrica-3.0.cl
-const UJJAIN = location(angle(23, 9, 0), angle(75, 46, 6),
+const UJJAIN* = location(angle(23, 9, 0), angle(75, 46, 6),
                   mt(0), days_from_hours(5 + 461/9000))
 
 
 # see lines 5213-5216 in calendrica-3.0.cl
 # see lines 217-218 in calendrica-3.0.errata.cl
-const HINDU_LOCATION = UJJAIN
+const HINDU_LOCATION* = UJJAIN
 
 proc mesha_samkranti*(g_year: int): float64 {.gcsafe.}
 
 # see lines 5489-5493 in calendrica-3.0.cl
-var SIDEREAL_START = precession(universal_from_local(mesha_samkranti(ce(285)).float64,
+var SIDEREAL_START* = precession(universal_from_local(mesha_samkranti(ce(285)).float64,
                                                        HINDU_LOCATION))
 
 # see lines 3341-3347 in calendrica-3.0.cl
@@ -3917,16 +3919,16 @@ proc lunar_phase_at_or_before*(phi, tee: float64): float64 =
 
 
 # see lines 3627-3631 in calendrica-3.0.cl
-const NEW = deg(0)
+const NEW* = deg(0)
 
 # see lines 3633-3637 in calendrica-3.0.cl
-const FIRST_QUARTER = deg(90)
+const FIRST_QUARTER* = deg(90)
 
 # see lines 3639-3643 in calendrica-3.0.cl
-const FULL = deg(180)
+const FULL* = deg(180)
 
 # see lines 3645-3649 in calendrica-3.0.cl
-const LAST_QUARTER = deg(270)
+const LAST_QUARTER* = deg(270)
 
 # see lines 3651-3661 in calendrica-3.0.cl
 proc lunar_phase_at_or_after*(phi, tee: float64): float64 =
@@ -4086,7 +4088,7 @@ proc phasis_on_or_before*(date: int, location: calLocationData): int =
 # see lines 220-221 in calendrica-3.0.errata.cl
 # Sample location for Observational Islamic calendar
 # (Cairo, Egypt).
-const ISLAMIC_LOCATION = location(deg(mpf(30.1)), deg(mpf(31.3)), mt(200), days_from_hours(2))
+const ISLAMIC_LOCATION* = location(deg(mpf(30.1)), deg(mpf(31.3)), mt(200), days_from_hours(2))
 
 
 # see lines 5868-5882 in calendrica-3.0.cl
@@ -4130,7 +4132,7 @@ proc astronomical_easter*(g_year: int): int =
     return kday_after(SUNDAY, paschal_moon)
 
 # see lines 5920-5923 in calendrica-3.0.cl
-const JAFFA = location(angle(32, 1, 60), angle(34, 45, 0), mt(0), days_from_hours(2))
+const JAFFA* = location(angle(32, 1, 60), angle(34, 45, 0), mt(0), days_from_hours(2))
 
 # see lines 5925-5938 in calendrica-3.0.cl
 proc phasis_on_or_after*(date: int, location: calLocationData): int = 
@@ -4187,7 +4189,7 @@ proc observational_hebrew_from_fixed*(date: int): calDate =
 
 
 # see lines 5993-5997 in calendrica-3.0.cl
-proc classical_passover_eve(g_year: int): int =
+proc classical_passover_eve*(g_year: int): int =
     ## Return fixed date of Classical (observational) Passover Eve
     ## (Nisan 14) occurring in Gregorian year, g_year.
     return observational_hebrew_new_year(g_year) + 13
@@ -4203,10 +4205,10 @@ proc persian_date*(year, month, day: int): calDate =
     return calDate(year: year, month: month, day: day)
 
 # see lines 3849-3852 in calendrica-3.0.cl
-const PERSIAN_EPOCH = fixed_from_julian(julian_date(ce(622), MARCH, 19))
+const PERSIAN_EPOCH* = fixed_from_julian(julian_date(ce(622), MARCH, 19))
 
 # see lines 3854-3858 in calendrica-3.0.cl
-const TEHRAN = location(deg(mpf(35.68)),
+const TEHRAN* = location(deg(mpf(35.68)),
                         deg(mpf(51.42)),
                         mt(1100),
                         days_from_hours(3 + 1/2))
@@ -4314,12 +4316,12 @@ proc naw_ruz*(g_year: int): int =
 # # bahai calendar algorithms #
 # #############################
 
-type calBahDate = object
-    major: int
-    cycle: int
-    year: int
-    month: int
-    day: int
+type calBahDate* = object
+    major*: int
+    cycle*: int
+    year*: int
+    month*: int
+    day*: int
 
 # see lines 4020-4023 in calendrica-3.0.cl
 proc bahai_date*(major, cycle, year, month, day: int): calBahDate =
@@ -4337,28 +4339,28 @@ proc bahai_cycle*(date: calBahDate): int =
     return date.cycle
 
 # see lines 4033-4035 in calendrica-3.0.cl
-proc bahai_year(date: calBahDate): int =
+proc bahai_year*(date: calBahDate): int =
     ## Return 'year' element of a  Bahai date, date.
     return date.year
 
 # see lines 4037-4039 in calendrica-3.0.cl
-proc bahai_month(date: calBahDate): int =
+proc bahai_month*(date: calBahDate): int =
     ## Return 'month' element of a  Bahai date, date.
     return date.month
 
 # see lines 4041-4043 in calendrica-3.0.cl
-proc bahai_day(date: calBahDate): int =
+proc bahai_day*(date: calBahDate): int =
     ## Return 'day' element of a  Bahai date, date.
     return date.day
 
 # see lines 4045-4048 in calendrica-3.0.cl
-const BAHAI_EPOCH = fixed_from_gregorian(gregorian_date(1844, MARCH, 21))
+const BAHAI_EPOCH* = fixed_from_gregorian(gregorian_date(1844, MARCH, 21))
 
 # see lines 4050-4053 in calendrica-3.0.cl
-const AYYAM_I_HA = 0
+const AYYAM_I_HA* = 0
 
 # see lines 4055-4076 in calendrica-3.0.cl
-proc fixed_from_bahai(b_date: calBahDate): int =
+proc fixed_from_bahai*(b_date: calBahDate): int =
     ## Return fixed date equivalent to the Bahai date, b_date.
     let major = bahai_major(b_date)
     let cycle = bahai_cycle(b_date)
@@ -4386,7 +4388,7 @@ proc fixed_from_bahai(b_date: calBahDate): int =
             day)
 
 # see lines 4078-4111 in calendrica-3.0.cl
-proc bahai_from_fixed(date: int): calBahDate =
+proc bahai_from_fixed*(date: int): calBahDate =
     ## Return Bahai date [major, cycle, year, month, day] corresponding
     ## to fixed date, date.
     let g_year = gregorian_year_from_fixed(date)
@@ -4414,22 +4416,22 @@ proc bahai_from_fixed(date: int): calBahDate =
 
 
 # see lines 4113-4117 in calendrica-3.0.cl
-proc bahai_new_year(g_year: int): int =
+proc bahai_new_year*(g_year: int): int =
     ## Return fixed date of Bahai New Year in Gregorian year, g_year.
     return fixed_from_gregorian(gregorian_date(g_year, MARCH, 21))
 
 # see lines 4119-4122 in calendrica-3.0.cl
-const HAIFA = location(deg(mpf(32.82)), deg(35), mt(0), days_from_hours(2))
+const HAIFA* = location(deg(mpf(32.82)), deg(35), mt(0), days_from_hours(2))
 
 
 # see lines 4124-4130 in calendrica-3.0.cl
-proc sunset_in_haifa(date: int): float64 =
+proc sunset_in_haifa*(date: int): float64 =
     ## Return universal time of sunset of evening
     ## before fixed date, date in Haifa.
     return universal_from_standard(sunset(date.float64, HAIFA), HAIFA)
 
 # see lines 4132-4141 in calendrica-3.0.cl
-proc future_bahai_new_year_on_or_before(date: int): int =
+proc future_bahai_new_year_on_or_before*(date: int): int =
     ## Return fixed date of Future Bahai New Year on or
     ## before fixed date, date.
     let approx = estimate_prior_solar_longitude(SPRING, sunset_in_haifa(date))
@@ -4438,7 +4440,7 @@ proc future_bahai_new_year_on_or_before(date: int): int =
                              (SPRING + deg(2))))
 
 # see lines 4143-4173 in calendrica-3.0.cl
-proc fixed_from_future_bahai(b_date: calBahDate): int =
+proc fixed_from_future_bahai*(b_date: calBahDate): int =
     ## Return fixed date of Bahai date, b_date.
     let major = bahai_major(b_date)
     let cycle = bahai_cycle(b_date)
@@ -4489,7 +4491,7 @@ proc future_bahai_from_fixed*(date: int): calBahDate =
 
 
 # see lines 4203-4213 in calendrica-3.0.cl
-proc feast_of_ridvan(g_year: int): int =
+proc feast_of_ridvan*(g_year: int): int =
     ## Return Fixed date of Feast of Ridvan in Gregorian year year, g_year.
     let years = g_year - gregorian_year_from_fixed(BAHAI_EPOCH)
     let major = 1 + quotient(years, 361)
@@ -4509,10 +4511,10 @@ proc french_date*(year, month, day: int): calDate =
 
 # see lines 4222-4226 in calendrica-3.0.cl
 #Fixed date of start of the French Revolutionary calendar.
-const FRENCH_EPOCH = fixed_from_gregorian(gregorian_date(1792, SEPTEMBER, 22))
+const FRENCH_EPOCH* = fixed_from_gregorian(gregorian_date(1792, SEPTEMBER, 22))
 
 # see lines 4228-4233 in calendrica-3.0.cl
-const PARIS = location(angle(48, 50, 11),
+const PARIS* = location(angle(48, 50, 11),
                        angle(2, 20, 15),
                        mt(27),
                        days_from_hours(1))
@@ -4632,7 +4634,7 @@ proc chinese_leap*(date: chinDate): bool =
     return date.leap
 
 # see lines 4351-4353 in calendrica-3.0.cl
-proc chinese_day(date: chinDate): int =
+proc chinese_day*(date: chinDate): int =
     ## Return 'day' element of a Chinese date, date.
     return date.day
 
@@ -4708,7 +4710,7 @@ proc chinese_new_moon_on_or_after*(date: int): int =
     return ifloor(standard_from_universal(tee, chinese_location(tee)))
 
 # see lines 4446-4449 in calendrica-3.0.cl
-const CHINESE_EPOCH = fixed_from_gregorian(gregorian_date(-2636, FEBRUARY, 15))
+const CHINESE_EPOCH* = fixed_from_gregorian(gregorian_date(-2636, FEBRUARY, 15))
 
 # see lines 4451-4457 in calendrica-3.0.cl
 proc is_chinese_no_major_solar_term*(date: int ): bool =
@@ -4871,7 +4873,7 @@ proc chinese_year_name*(year: int): (int, int) =
 
 
 # see lines 4651-4655 in calendrica-3.0.cl
-const CHINESE_MONTH_NAME_EPOCH = 57
+const CHINESE_MONTH_NAME_EPOCH* = 57
 
 # see lines 4657-4664 in calendrica-3.0.cl
 # see lines 211-212 in calendrica-3.0.errata.cl
@@ -4881,7 +4883,7 @@ proc chinese_month_name*(month, year: int): (int, int) =
     return chinese_sexagesimal_name(elapsed_months - CHINESE_MONTH_NAME_EPOCH)
 
 # see lines 4666-4669 in calendrica-3.0.cl
-const CHINESE_DAY_NAME_EPOCH = rd(45)
+const CHINESE_DAY_NAME_EPOCH* = rd(45)
 
 # see lines 4671-4675 in calendrica-3.0.cl
 # see lines 208-209 in calendrica-3.0.errata.cl
@@ -5077,7 +5079,8 @@ proc hindu_arcsin*(amp: float64): float64 =
     if (amp < 0.0):
         return -hindu_arcsin(-amp)
     else:
-        let pos = next(0, proc(k:int):bool = amp <= hindu_sine_table(k))
+        let pos = next(0, proc(k:int):bool = 
+                                  amp <= hindu_sine_table(k))
         let below = hindu_sine_table(pos - 1)
         return (angle(0, 225, 0) *
                 (pos.float64 - 1.0 + ((amp - below) / (hindu_sine_table(pos) - below))))
@@ -5093,7 +5096,10 @@ const HINDU_CREATION* = HINDU_EPOCH.float64 - 1955880000.0 * HINDU_SIDEREAL_YEAR
 proc hindu_mean_position*(tee, period: float64): float64 =
     ## Return the position in degrees at moment, tee, in uniform circular
     ## orbit of period days.
-    return deg(360.0) * modulo((tee - HINDU_CREATION) / period, 1.0)
+    when defined(js):
+        return deg(360.0) * `mod`((tee - HINDU_CREATION) / period, 1.0)
+    else:
+        return deg(360.0) * modulo((tee - HINDU_CREATION) / period, 1.0)
 
 # see lines 4891-4894 in calendrica-3.0.cl
 const HINDU_SIDEREAL_MONTH* = 27 + mpf(4644439) / mpf(14438334)
@@ -5820,7 +5826,7 @@ proc tibetan_sun_equation*[T](alpha: T): float64 =
     elif (alpha > 3):
         return tibetan_sun_equation(6 - alpha)
     elif alpha is int:
-        return [0.0, 6/60, 10/60, 11/60][alpha]
+        return [0.0, 6/60, 10/60, 11/60][alpha.int]
     else:
         return ((modulo(alpha, 1.0) * tibetan_sun_equation(ceiling(alpha.float64))) +
                 (modulo(-alpha, 1.0) * tibetan_sun_equation(ifloor(alpha.float64))))
@@ -5835,7 +5841,7 @@ proc tibetan_moon_equation*[T](alpha: T): float64 =
         return tibetan_moon_equation(14 - alpha)
     elif alpha is int:
         return [0.0, 5/60, 10/60, 15/60,
-                19/60, 22/60, 24/60, 25/60][alpha]
+                19/60, 22/60, 24/60, 25/60][alpha.int]
     else:
         return ((modulo(alpha, 1.0) * tibetan_moon_equation(ceiling(alpha.float64))) +
                 (modulo(-alpha, 1.0) * tibetan_moon_equation(ifloor(alpha.float64))))
@@ -5857,9 +5863,9 @@ proc fixed_from_tibetan*(t_date: hinduLDate): int =
     let mean = ((days * 11135/11312) - 30 +
                 (if leap_day: 0 else: -1) +
                 1071/1616)
-    let solar_anomaly = modulo((days * 13/4824) + 2117/4824, 1)
+    let solar_anomaly = modulo((days * 13/4824) + 2117/4824, 1.0)
     let lunar_anomaly = modulo((days * 3781/105840) +
-                            2837/15120, 1)
+                            2837/15120, 1.0)
     let sun  = -tibetan_sun_equation(12 * solar_anomaly)
     let moon = tibetan_moon_equation(28 * lunar_anomaly)
     return ifloor(TIBETAN_EPOCH.float64 + mean + sun + moon)
@@ -5879,11 +5885,12 @@ proc tibetan_from_fixed*(date: int): hinduLDate =
                                  fixed_from_tibetan(
                                      tibetan_date(year0, m, false, 1, false))))
     let est = date - fixed_from_tibetan(
-           tibetan_date(year0, month0, false, 1, false))
+                       tibetan_date(year0, month0, false, 1, false))
     let day0 = final(est - 2,
-                    proc(d:int):bool = (date >=
-                               fixed_from_tibetan(
-                                   tibetan_date(year0, month0, false, d, false))))
+                    proc(d:int):bool = 
+                        date >= fixed_from_tibetan(
+                                   tibetan_date(year0, month0, false, d, false)))
+
     let leap_month = (day0 > 30)
     let day = amod(day0, 30)
 
@@ -5905,6 +5912,7 @@ proc tibetan_from_fixed*(date: int): hinduLDate =
         year = year0
     let leap_day = date == fixed_from_tibetan(
            tibetan_date(year, month, leap_month, day, true))
+    
     return tibetan_date(year, month, leap_month, day, leap_day)
 
 
@@ -5925,7 +5933,7 @@ proc losar*(t_year: int): int =
     return fixed_from_tibetan(tibetan_date(t_year, 1, t_leap, 1, false))
 
 # see lines 5815-5824 in calendrica-3.0.cl
-proc tibetan_new_year(g_year: int): seq[int] =
+proc tibetan_new_year*(g_year: int): seq[int] =
     ## Return the list of fixed dates of Tibetan New Year in
     ## Gregorian year, g_year.
     let dec31  = gregorian_year_end(g_year)
@@ -5991,12 +5999,35 @@ when isMainModule:
 
     let curr_year = getLocalTime(getTime()).year
     let now = fixed_from_now()
-    echo "now: ", gregorian_from_fixed(now)
-    let hebrew_current = hebrew_from_fixed(now)
-    echo "hebrew now: ", hebrew_current
+    echo "some values now can be converted to:"
+    echo "day_of_week_from_fixed            ", $day_of_week_from_fixed(now)
+    echo "jd_from_fixed                     ", $jd_from_fixed(now)
+    echo "mjd_from_fixed                    ", $mjd_from_fixed(now)
+    echo "egyptian_from_fixed               ", $egyptian_from_fixed(now)
+    echo "armenian_from_fixed               ", $armenian_from_fixed(now)
+    echo "gregorian_from_fixed              ", $gregorian_from_fixed(now)
+    echo "julian_from_fixed                 ", $julian_from_fixed(now)
+    echo "roman_from_fixed                  ", $roman_from_fixed(now)
+    echo "iso_from_fixed                    ", $iso_from_fixed(now)
+    echo "coptic_from_fixed                 ", $coptic_from_fixed(now)
+    echo "ethiopic_from_fixed               ", $ethiopic_from_fixed(now)
+    echo "islamic_from_fixed                ", $islamic_from_fixed(now)
+    echo "hebrew_from_fixed                 ", $hebrew_from_fixed(now)
+    echo "persian_from_fixed                ", $persian_from_fixed(now)
+    echo "bahai_from_fixed                  ", $bahai_from_fixed(now)
+    echo "french_from_fixed                 ", $french_from_fixed(now)
+    echo "chinese_from_fixed                ", $chinese_from_fixed(now)
+    echo "hindu_solar_from_fixed            ", $hindu_solar_from_fixed(now)
+    echo "hindu_lunar_from_fixed            ", $hindu_lunar_from_fixed(now)
+#    echo "hindu_fullmoon_from_fixed         ", $hindu_fullmoon_from_fixed(now)
+    echo "astro_hindu_solar_from_fixed      ", $astro_hindu_solar_from_fixed(now)
+    echo "astro_hindu_lunar_from_fixed      ", $astro_hindu_lunar_from_fixed(now)
+    echo "tibetan_from_fixed                ", $tibetan_from_fixed(now)
+
 
     echo "-".repeat(80)
     echo "next 20 Hebrew New Years"
+    let hebrew_current = hebrew_from_fixed(now)
     var hyr = hebrew_current.year
     for yr in hyr+1..hyr+21:
       let new_yr = hebrew_new_year(yr)

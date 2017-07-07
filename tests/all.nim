@@ -11,3 +11,9 @@ import copticAndEthiopicCalendarsUnitTest
 import julianCalendarUnitTest
 import chineseCalendarUnitTest
 import modernHinduCalendarsUnitTest
+import balineseCalendarUnitTest
+import mayanCalendarsUnitTest
+import oldHinduCalendarsUnitTest
+import persianCalendarUnitTest
+import tibetanCalendarUnitTest
+import timeAndAstronomyUnitTest

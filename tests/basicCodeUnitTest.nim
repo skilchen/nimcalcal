@@ -93,23 +93,16 @@ suite "BasicCodeTestCase":
         check abs(0.8 - x) < epsilon
 
 when not defined(js):
-    import parsecsv, streams, strutils
+    import strutils
+    import readTestDataHelper
     suite "get weekday names from fixed dates in csv data file":
+        setup:
+            let data = readTestData("tests/dates1.csv")
+
         test "Weekdays":
-            var filename = "tests/dates1.csv"
-            var s = newFileStream(filename)
-            if s == nil:
-                echo "can't open file"
-                quit(1)
-            var x = CsvParser()
-            var data: seq[(int, string)]
-            data = @[]
-            open(x, s, filename)
-            while readRow(x):
-                data.add((parseInt(x.row[0]), x.row[1]))
-            close(x)
             for d in data:
-                let dwn = DAYS_OF_WEEK_NAMES[day_of_week_from_fixed(d[0])]
+                let rd = parseInt(d[0])
+                let dwn = DAYS_OF_WEEK_NAMES[day_of_week_from_fixed(rd)]
                 #stderr.write($gregorian_from_fixed(d[0]) & " " & dwn, " " & d[1] & "\n")
                 #stderr.write(dwn & " " & d[1] & "\n")
                 check  dwn == d[1]

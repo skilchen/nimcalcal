@@ -15,24 +15,11 @@ suite "Test Easter Calculations":
     check $oed == "2017-04-16"
 
 when not defined(js):    
-  import streams, parsecsv, sequtils, strutils
+  import strutils
+  import readTestDataHelper
   suite "Test Easter Calculation with Test Data from csv File":
     setup:
-      var filename = "tests/dates3.csv"
-      var s = newFileStream(filename)
-      if s == nil:
-        echo "can't open file"
-        quit(1)
-      var x = CsvParser()
-      var data: seq[seq[string]]
-      data = @[]
-      open(x, s, filename)
-      while readRow(x):
-        var myrow: seq[string] = @[]
-        for item in x.row:
-          myrow.add(item)
-        data.add(myrow)
-      close(x)
+      let data = readTestData("tests/dates3.csv")
 
     test "testEaster":
         for d in data:

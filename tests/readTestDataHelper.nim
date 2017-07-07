@@ -1,6 +1,6 @@
 import parsecsv, streams, strutils
 proc readTestData*(filename: string): seq[seq[string]] =
-    echo "reading test data..."
+    #echo "reading test data..."
     var s = newFileStream(filename)
     if s == nil:
         echo "can't open file ", filename

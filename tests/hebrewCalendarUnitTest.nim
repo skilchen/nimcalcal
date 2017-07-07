@@ -31,25 +31,12 @@ suite "HebrewHolidaysTestCase":
 
 
 when not defined(js):
-    import parsecsv, streams, strutils
+    import strutils
+    import readTestDataHelper
+
     suite "HebrewAppendixCTestCase":
         setup:
-            echo "reading test data..."
-            var filename = "tests/dates3.csv"
-            var s = newFileStream(filename)
-            if s == nil:
-                echo "can't open file"
-                quit(1)
-            var x = CsvParser()
-            var data: seq[seq[string]]
-            data = @[]
-            open(x, s, filename)
-            while readRow(x):
-                var myrow: seq[string] = @[]
-                for item in x.row:
-                    myrow.add(item)
-                data.add(myrow)
-            close(x)    
+            let data = readTestData("tests/dates3.csv")
 
         test "testHebrew":
             for d in data:

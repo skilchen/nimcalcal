@@ -24,25 +24,12 @@ suite "Test the Gregorian Calendar":
         check day_number(aLeapDate) == 60
 
 when not defined(js):
-    import parsecsv, streams, strutils
+    import strutils
+    import readTestDataHelper
+
     suite "Test the Gregorian Calendar with Test Data from csv File":
-        echo "reading test data..."
         setup:
-            var filename = "tests/dates1.csv"
-            var s = newFileStream(filename)
-            if s == nil:
-                echo "can't open file"
-                quit(1)
-            var x = CsvParser()
-            var data: seq[seq[string]]
-            data = @[]
-            open(x, s, filename)
-            while readRow(x):
-                var myrow: seq[string] = @[]
-                for item in x.row:
-                    myrow.add(item)
-                data.add(myrow)
-            close(x)
+            let data = readTestData("tests/dates1.csv")
 
         test "testGregorian":
             for d in data:

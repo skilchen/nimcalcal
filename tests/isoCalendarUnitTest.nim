@@ -14,25 +14,12 @@ suite "ISOSmokeTestCase":
         check testvalue == fixed_from_iso(aDate)
 
 when not defined(js):
-    import parsecsv, streams, strutils
+    import strutils
+    import readTestDataHelper
+
     suite "IsoAppendixCTestCase":
         setup:
-            echo "reading test data..."
-            var filename = "tests/dates1.csv"
-            var s = newFileStream(filename)
-            if s == nil:
-                echo "can't open file"
-                quit(1)
-            var x = CsvParser()
-            var data: seq[seq[string]]
-            data = @[]
-            open(x, s, filename)
-            while readRow(x):
-                var myrow: seq[string] = @[]
-                for item in x.row:
-                    myrow.add(item)
-                data.add(myrow)
-            close(x)
+            let data = readTestData("tests/dates1.csv")
         
         test "testIso":
             for d in data:

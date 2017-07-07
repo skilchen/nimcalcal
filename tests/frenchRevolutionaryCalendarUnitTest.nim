@@ -1,11 +1,11 @@
 import unittest
 import nimcalcal
+import math
 
 suite "testFrenchRevolutionarySmoke":
     test "testMidnightInParis":
-        let d = fixed_from_gregorian(gregorian_date(1992, OCTOBER, 13)) 
-        echo d, " ", midnight_in_paris(d)
-        check midnight_in_paris(d).int == d + 1
+        let d = fixed_from_gregorian(gregorian_date(1992, OCTOBER, 12)) 
+        check midnight_in_paris(d).round.int == d + 1
 
 
 when not defined(js):
