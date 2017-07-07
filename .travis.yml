@@ -19,7 +19,7 @@ before_script:
 
 script:
   - nim c -r tests/all
-  - ./src/nimble install -y
+  - nimble install -y
 
 notifications:
   email: "skilchen@bluewin.ch"
