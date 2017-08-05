@@ -5,7 +5,6 @@ author        = "skilchen"
 description   = "clone of pycalcal"
 license       = "MIT"
 
-srcDir        = "src"
 bin           = @["nimcalcal"]
 
 backend       = "c"
@@ -13,9 +12,10 @@ backend       = "c"
 # Dependencies
 
 requires "nim >= 0.17.0"
+requires "strfmt >= 0.8.5"
 
 task tests, "Run the nimcalcal tester":
-  exec "nim c -r tests/all"
+  exec "nim c -r nimcalcalpkg/tests/all"
 
-task tests_js, "Run the nimcalcal tester using the js backend":  
-    exec "nim js -d:nodejs --threads:off -r tests/all"
+task tests_js, "Run the nimcalcal tester using the js backend":
+    exec "nim js -d:nodejs --threads:off -r nimcalcalpkg/tests/all"
