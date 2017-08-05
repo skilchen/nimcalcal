@@ -3,4 +3,4 @@
 !*.nim.cfg
 nimcache/
 *.swp
-*.exe
+/*.exe
