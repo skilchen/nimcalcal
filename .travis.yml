@@ -24,8 +24,8 @@ before_script:
 script:
   - nim c -r nimblepkg/tests/all
   - nim c -r nimblepkg/nimcalcal
-  - nim js -d:nodejs --threads:off -r nimblepkg/tests/all
-  - nim js -d:nodejs --threads:off -r nimblepkg/nimcalcal.nim
+  - nim js -d:nodejs --threads:off -r nimcalcalpkg/tests/all
+  - nim js -d:nodejs --threads:off -r nimcalcalkg/nimcalcal.nim
 
 cache:
   directories:
