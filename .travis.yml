@@ -28,7 +28,7 @@ before_script:
   - set -e
   - set -x
   - export PATH=`pwd`/nim-0.17.0/bin:$PATH
-  - nimble install strfmt
+  - nimble install strfmt -y
 
 script:
   - nim c -r nimcalcal
