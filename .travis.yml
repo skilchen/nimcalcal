@@ -15,11 +15,20 @@ install:
         rm -rf csources
         cd ..
       fi
+      if [ ! -x nim-0.17.0/koch ]
+      then
+        cd nim-0.17.0
+        bin/nim c koch
+        ./koch boot -d:release
+        ./koch nimble
+        cd ..
+      fi
 
 before_script:
   - set -e
   - set -x
   - export PATH=`pwd`/nim-0.17.0/bin:$PATH
+  - nimble build -y
 
 script:
   - nim c -r nimcalcalpkg/tests/all
