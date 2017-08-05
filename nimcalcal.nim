@@ -52,7 +52,6 @@ import math
 import times
 import tables
 import sequtils
-import strfmt
 
 type 
     calDate* = object
@@ -2829,10 +2828,10 @@ type calLocationData* = object
 
 proc `$`*(loc: calLocationData): string = 
   result = ""
-  result.add("latitude: " & round(loc.latitude, 2).format(".2f"))
-  result.add(", longitude: " & round(loc.longitude, 2).format(".2f"))
-  result.add(", elevation: " & round(loc.elevation, 2).format(".2f"))
-  result.add(", zone: " & round(loc.zone * 24, 2).format(".2f"))
+  result.add("latitude: " & $round(loc.latitude, 2))
+  result.add(", longitude: " & $round(loc.longitude, 2))
+  result.add(", elevation: " & $round(loc.elevation, 2))
+  result.add(", zone: " & $round(loc.zone * 24, 2))
 
 
 # see lines 3297-3300 in calendrica-3.0.cl
