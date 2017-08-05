@@ -18,4 +18,4 @@ task tests, "Run the nimcalcal tester":
   exec "nim c -r nimcalcalpkg/tests/all"
 
 task tests_js, "Run the nimcalcal tester using the js backend":
-    exec "nim js -d:nodejs --threads:off -r nimcalcalpkg/tests/all"
+  exec "nim js -d:nodejs --threads:off -r nimcalcalpkg/tests/all"

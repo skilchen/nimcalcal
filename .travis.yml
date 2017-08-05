@@ -32,9 +32,9 @@ before_script:
 
 script:
   - nim c -r nimcalcalpkg/tests/all
-  - nim c -r nimcalcalpkg/nimcalcal
+  - nim c -r nimcalcal
   - nim js -d:nodejs --threads:off -r nimcalcalpkg/tests/all
-  - nim js -d:nodejs --threads:off -r nimcalcalkg/nimcalcal.nim
+  - nim js -d:nodejs --threads:off -r nimcalcal.nim
 
 cache:
   directories:
