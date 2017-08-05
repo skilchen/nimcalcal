@@ -13,6 +13,7 @@ install:
         cd nim-0.17.0
         sh build.sh
         rm -rf csources
+        cd ..
       fi
 
 before_script:
@@ -29,6 +30,6 @@ script:
 cache:
   directories:
     - nim-0.17.0
-  
+
 notifications:
   email: "skilchen@bluewin.ch"
