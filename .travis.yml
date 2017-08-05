@@ -6,11 +6,14 @@ language: c
 
 install:
   - |
-      wget https://nim-lang.org/download/nim-0.17.0.tar.xz
-      tar -xf nim-0.17.0.tar.xz
-      cd nim-0.17.0
-      sh build.sh
-      cd ..
+      if [ ! -x nim-0.17.0/bin/nim ]
+      then
+        wget https://nim-lang.org/download/nim-0.17.0.tar.xz
+        tar -xf nim-0.17.0.tar.xz
+        cd nim-0.17.0
+        sh build.sh
+        rm -rf csources
+      fi
 
 before_script:
   - set -e
@@ -23,5 +26,9 @@ script:
   - nim js -d:nodejs --threads:off -r tests/all
   - nim js -d:nodejs --threads:off -r src/nimcalcal.nim
 
+cache:
+  directories:
+    - nim-0.17.0
+  
 notifications:
   email: "skilchen@bluewin.ch"
