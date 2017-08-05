@@ -28,9 +28,9 @@ before_script:
   - set -e
   - set -x
   - export PATH=`pwd`/nim-0.17.0/bin:$PATH
-  - nimble build -y
 
 script:
+  - nimble build -y  
   - nim c -r nimcalcalpkg/tests/all
   - nim c -r nimcalcal
   - nim js -d:nodejs --threads:off -r nimcalcalpkg/tests/all
