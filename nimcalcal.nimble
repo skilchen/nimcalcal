@@ -12,7 +12,6 @@ backend       = "c"
 # Dependencies
 
 requires "nim >= 0.17.0"
-requires "strfmt >= 0.8.5"
 
 task tests, "Run the nimcalcal tester":
   exec "nim c -r nimcalcalpkg/tests/all"
