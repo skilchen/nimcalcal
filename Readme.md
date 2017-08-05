@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/skilchen/nimcalcal.svg?branch=master)](https://travis-ci.org/skilchen/nimcalcal)
+
 *PyCalCal* is a Python library that makes it easy:
 
 *   to convert dates from/to 31 different calendars
