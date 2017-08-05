@@ -30,7 +30,7 @@ before_script:
   - export PATH=`pwd`/nim-0.17.0/bin:$PATH
 
 script:
-  - ls -l
+  - nim c -r nimcalcal
 
 cache:
   directories:
