@@ -16,9 +16,9 @@ before_script:
   - export PATH=$(pwd)/bin${PATH:+:$PATH}
 
 script:
-  - cd ..
   - nim c koch
   - ./koch boot
+  - cd ..
   - nim c -r nimcalcalpkg/tests/all
   - nim c -r nimcalcal
   - nim js -d:nodejs --threads:off -r nimcalcalpkg/tests/all
