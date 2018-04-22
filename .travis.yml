@@ -6,6 +6,8 @@ language: c
 
 before_script:
   - set -e
+  - git clone -b devel --depth 1 git://github.com/nim-lang/nim nim-devel/
+  - cd nim-devel
   - git clone --depth 1 https://github.com/nim-lang/csources.git
   - cd csources
   - sh build.sh
@@ -14,6 +16,7 @@ before_script:
   - export PATH=$(pwd)/bin${PATH:+:$PATH}
 
 script:
+  - cd ..
   - nim c koch
   - ./koch boot
   - nim c -r nimcalcalpkg/tests/all
