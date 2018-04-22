@@ -718,7 +718,7 @@ proc fixed_from_now*(): int =
 proc moment_from_now*(): float64 =
     let ti = now().utc()
     let fixed = fixed_from_gregorian(
-                  gregorian_date(ti.year, ord(ti.month) + 1, ti.monthday))
+                  gregorian_date(ti.year, ord(ti.month), ti.monthday))
     let td = time_of_day(ti.hour, ti.minute, ti.second.float64)
     return fixed.float64 + time_from_clock(td)
 
